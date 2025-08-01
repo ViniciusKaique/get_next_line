@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vinpache <vinpache@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/30 15:03:14 by vinpache          #+#    #+#             */
-/*   Updated: 2025/07/30 15:03:16 by vinpache         ###   ########.fr       */
+/*   Created: 2025/08/01 09:13:44 by vinpache          #+#    #+#             */
+/*   Updated: 2025/08/01 09:13:46 by vinpache         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,15 @@
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 42
+
 # endif
 
-# ifndef OPEN_MAX
-#  define OPEN_MAX 1024
-# endif
-
+size_t	ft_strlen(char *str);
 char	*get_next_line(int fd);
-size_t	ft_strlen(const char *s);
-char	*ft_strjoin(char const *s1, char const *s2);
-char	*ft_strchr(const char *s, int c);
-char	*ft_strdup(const char *s);
-char	*ft_substr(const char *s, size_t start, size_t len);
-//df
+char	*remain_text(char *text);
+char	*ft_get_line(char *text);
+char	*ft_strchr(char *str, char c);
+char	*ft_strjoin(char *s1, char *s2);
+char	*ft_read(int fd, char *read_line);
+
 #endif

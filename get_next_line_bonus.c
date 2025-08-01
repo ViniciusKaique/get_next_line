@@ -5,72 +5,49 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vinpache <vinpache@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/30 15:02:29 by vinpache          #+#    #+#             */
-/*   Updated: 2025/07/30 15:02:31 by vinpache         ###   ########.fr       */
+/*   Created: 2025/08/01 09:19:10 by vinpache          #+#    #+#             */
+/*   Updated: 2025/08/01 11:14:18 by vinpache         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-static char	*read_line(int fd, char **saved)
+char	*read_from(int fd, char *read_line)
 {
-	char	*buffer;
-	char	*temp;
-	ssize_t	bytes_read;
+	char	*buff;
+	int		r_bytes;
 
-	buffer = malloc((size_t)BUFFER_SIZE + 1);
-	if (!buffer)
-		return (free(*saved), *saved = NULL, NULL);
-	while (!ft_strchr(*saved, '\n'))
-	{
-		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		if (bytes_read == -1)
-			return (free(buffer), free(*saved), *saved = NULL, NULL);
-		if (bytes_read == 0)
-			break ;
-		buffer[bytes_read] = '\0';
-		temp = *saved;
-		*saved = ft_strjoin(*saved, buffer);
-		free(temp);
-		if (!*saved)
-			return (free(buffer), NULL);
-	}
-	return (free(buffer), *saved);
-}
-
-static char	*extract_line(char **saved)
-{
-	char	*line;
-	char	*temp;
-	size_t	len;
-
-	if (!*saved || !**saved)
+	r_bytes = 1;
+	buff = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buff)
 		return (NULL);
-	len = 0;
-	while ((*saved)[len] && (*saved)[len] != '\n')
-		len++;
-	line = ft_substr(*saved, 0, len + ((*saved)[len] == '\n'));
-	temp = *saved;
-	*saved = ft_strdup(*saved + len + ((*saved)[len] == '\n'));
-	free(temp);
-	if (!line || !*saved)
-		return (free(line), NULL);
-	return (line);
+	while (r_bytes > 0 && !ft_strchr(read_line, '\n'))
+	{
+		r_bytes = read(fd, buff, BUFFER_SIZE);
+		if (r_bytes == -1)
+		{
+			free(buff);
+			free(read_line);
+			return (NULL);
+		}
+		buff[r_bytes] = '\0';
+		read_line = ft_strjoin(read_line, buff);
+	}
+	free(buff);
+	return (read_line);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*saved[OPEN_MAX];
+	static char	*read_lines[MAX_FD];
 	char		*line;
 
-	if (fd < 0 || fd >= OPEN_MAX || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= MAX_FD)
 		return (NULL);
-	if (!saved[fd])
-		saved[fd] = ft_strdup("");
-	if (!saved[fd] || !read_line(fd, &saved[fd]))
-		return (free(saved[fd]), saved[fd] = NULL, NULL);
-	line = extract_line(&saved[fd]);
-	if (!line)
-		return (free(saved[fd]), saved[fd] = NULL, NULL);
+	read_lines[fd] = read_from(fd, read_lines[fd]);
+	if (!read_lines[fd])
+		return (NULL);
+	line = ft_get_line(read_lines[fd]);
+	read_lines[fd] = remain_text(read_lines[fd]);
 	return (line);
 }
